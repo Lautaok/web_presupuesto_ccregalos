@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF--8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Presupuestos</title>
+    <style>
+        :root {
+            --primary-color: #004a7f;
+            --secondary-color: #fdd835;
+            --background-color: #f4f6f8;
+            --text-color: #333;
+            --card-bg-color: #ffffff;
+            --border-color: #e0e0e0;
+            --success-bg: #e8f5e9;
+            --success-text: #2e7d32;
+            --info-bg: #e3f2fd;
+            --info-text: #0277bd;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        .container {
+            width: 100%;
+            max-width: 800px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        .card {
+            background-color: var(--card-bg-color);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 25px;
+            border-left: 5px solid var(--primary-color);
+        }
+        .card-header {
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .form-group {
+            margin-bottom: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .form-group label {
+            flex-basis: 50%;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        .form-group .input-wrapper {
+            flex-basis: 45%;
+            display: flex;
+            align-items: center;
+        }
+        .form-group .input-wrapper .symbol {
+            margin-right: 8px;
+            font-weight: bold;
+        }
+        .form-group input[type="number"],
+        .form-group input[type="text"],
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        .form-group .output {
+            font-weight: bold;
+            font-size: 1.1rem;
+            text-align: right;
+            color: var(--primary-color);
+        }
+
+        .highlight-yellow {
+            background-color: #fff9c4;
+            border-color: #fbc02d;
+        }
+        
+        .results-section .form-group {
+            background-color: var(--info-bg);
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        
+        .results-section .form-group label {
+            color: var(--info-text);
+        }
+
+        .final-price {
+            background-color: var(--success-bg) !important;
+            padding: 15px !important;
+            margin-top: 15px !important;
+        }
+        .final-price label, .final-price .output {
+            color: var(--success-text) !important;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        
+        @media (max-width: 600px) {
+            .form-group label,
+            .form-group .input-wrapper {
+                flex-basis: 100%;
+            }
+            .form-group .output {
+                text-align: left;
+                margin-top: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+
+        <div class="card">
+            <div class="card-header">CONFIGURACIÓN DE COSTOS</div>
+            
+            <div class="form-group">
+                <label for="costoTintaSet">Costo Total Set de Tintas</label>
+                <div class="input-wrapper">
+                    <span class="symbol">$</span>
+                    <input type="number" id="costoTintaSet" value="150426">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="rendimientoTinta">Rendimiento Estimado (Páginas A4)</label>
+                <div class="input-wrapper">
+                    <input type="number" id="rendimientoTinta" value="800">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="costoTintaPorPagina">Costo de Tinta por Página A4 (Editable)</label>
+                 <div class="input-wrapper">
+                    <span class="symbol">$</span>
+                    <input type="number" id="costoTintaPorPagina" step="0.01">
+                </div>
+            </div>
+            <hr>
+            <div class="form-group">
+                <label for="costoPapelPaquete">Costo Paquete de Papel</label>
+                <div class="input-wrapper">
+                    <span class="symbol">$</span>
+                    <input type="number" id="costoPapelPaquete" value="11472">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="unidadesPapel">Unidades por Paquete</label>
+                <div class="input-wrapper">
+                    <input type="number" id="unidadesPapel" value="100">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Costo de Papel por Hoja</label>
+                <div class="input-wrapper output" id="costoPorHoja">$ 114.72</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">TUS SERVICIOS</div>
+            <div class="form-group">
+                <label for="costoDiseno">Costo por Diseño</label>
+                <div class="input-wrapper">
+                    <span class="symbol">$</span>
+                    <input type="number" id="costoDiseno" value="2000">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="margenGanancia">Tu Margen de Ganancia</label>
+                <div class="input-wrapper">
+                    <input type="number" id="margenGanancia" value="40">
+                    <span class="symbol" style="margin-left: 8px;">%</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card highlight-yellow">
+            <div class="card-header">INGRESA LOS DATOS DEL TRABAJO</div>
+             <div class="form-group">
+                <label for="cliente">Cliente</label>
+                <div class="input-wrapper">
+                    <input type="text" id="cliente" placeholder="Nombre del cliente">
+                </div>
+            </div>
+             <div class="form-group">
+                <label for="trabajo">Trabajo</label>
+                <div class="input-wrapper">
+                    <input type="text" id="trabajo" placeholder="Ej: 50 Tarjetas Personales">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="cantidadHojas">Cantidad de Hojas A4 a usar</label>
+                <div class="input-wrapper">
+                    <input type="number" id="cantidadHojas" value="10">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="incluyeDiseno">¿Incluye Diseño?</label>
+                <div class="input-wrapper">
+                    <select id="incluyeDiseno">
+                        <option value="si" selected>Sí</option>
+                        <option value="no">No</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="card results-section">
+            <div class="card-header">DESGLOSE DE COSTOS (Cálculos Automáticos)</div>
+            <div class="form-group">
+                <label>Costo Total de Tinta:</label>
+                <div class="input-wrapper output" id="totalCostoTinta">$ 0.00</div>
+            </div>
+            <div class="form-group">
+                <label>Costo Total de Papel:</label>
+                <div class="input-wrapper output" id="totalCostoPapel">$ 0.00</div>
+            </div>
+            <div class="form-group">
+                <label>Costo de Diseño:</label>
+                <div class="input-wrapper output" id="totalCostoDiseno">$ 0.00</div>
+            </div>
+            <div class="form-group" style="background-color: #ffe0b2; margin-top: 15px;">
+                <label style="font-weight: bold; color: #e65100;">COSTO TOTAL DE PRODUCCIÓN</label>
+                <div class="input-wrapper output" style="font-weight: bold; color: #e65100;" id="costoTotalProduccion">$ 0.00</div>
+            </div>
+        </div>
+        
+        <div class="card results-section">
+             <div class="card-header">PRECIO DE VENTA SUGERIDO</div>
+             <div class="form-group">
+                <label>Ganancia a Obtener:</label>
+                <div class="input-wrapper output" id="ganancia">$ 0.00</div>
+            </div>
+            <div class="form-group final-price">
+                <label>PRECIO FINAL AL CLIENTE</label>
+                <div class="input-wrapper output" id="precioFinal">$ 0.00</div>
+            </div>
+        </div>
+        
+        <div class="card results-section">
+             <div class="card-header">DATO CLAVE</div>
+             <div class="form-group" style="background-color: #cfd8dc;">
+                <label style="color: #37474f;">Monto a separar para TINTAS y HOJAS</label>
+                <div class="input-wrapper output" style="color: #37474f;" id="montoSeparar">$ 0.00</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Función para formatear números como moneda
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('es-AR', {
+                style: 'currency',
+                currency: 'ARS',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(value);
+        }
+
+        function calcularTodo() {
+            // --- 1. Obtener valores de los inputs de configuración ---
+            const costoTintaSet = parseFloat(document.getElementById('costoTintaSet').value) || 0;
+            const rendimientoTinta = parseFloat(document.getElementById('rendimientoTinta').value) || 1;
+            const costoPapelPaquete = parseFloat(document.getElementById('costoPapelPaquete').value) || 0;
+            const unidadesPapel = parseFloat(document.getElementById('unidadesPapel').value) || 1;
+            
+            // --- 2. Obtener valores de los inputs del trabajo ---
+            // AHORA LEE EL VALOR DEL CAMPO EDITABLE DE COSTO DE TINTA
+            const costoTintaPorPagina = parseFloat(document.getElementById('costoTintaPorPagina').value) || 0;
+            const costoDiseno = parseFloat(document.getElementById('costoDiseno').value) || 0;
+            const margenGanancia = parseFloat(document.getElementById('margenGanancia').value) || 0;
+            const cantidadHojas = parseFloat(document.getElementById('cantidadHojas').value) || 0;
+            const incluyeDiseno = document.getElementById('incluyeDiseno').value;
+
+            // --- 3. Cálculos de Costos Unitarios (Papel) ---
+            const costoPorHoja = costoPapelPaquete / unidadesPapel;
+
+            // --- 4. Cálculos del Desglose ---
+            const totalCostoTinta = costoTintaPorPagina * cantidadHojas;
+            const totalCostoPapel = costoPorHoja * cantidadHojas;
+            const totalCostoDiseno = (incluyeDiseno === 'si') ? costoDiseno : 0;
+            
+            const costoTotalProduccion = totalCostoTinta + totalCostoPapel + totalCostoDiseno;
+
+            // --- 5. Cálculos del Precio de Venta ---
+            const ganancia = costoTotalProduccion * (margenGanancia / 100);
+            const precioFinal = costoTotalProduccion + ganancia;
+            
+            // --- 6. Cálculo del Dato Clave ---
+            const montoSeparar = totalCostoTinta + totalCostoPapel;
+
+            // --- 7. Actualizar la interfaz ---
+            document.getElementById('costoPorHoja').textContent = formatCurrency(costoPorHoja);
+            
+            document.getElementById('totalCostoTinta').textContent = formatCurrency(totalCostoTinta);
+            document.getElementById('totalCostoPapel').textContent = formatCurrency(totalCostoPapel);
+            document.getElementById('totalCostoDiseno').textContent = formatCurrency(totalCostoDiseno);
+            document.getElementById('costoTotalProduccion').textContent = formatCurrency(costoTotalProduccion);
+            
+            document.getElementById('ganancia').textContent = formatCurrency(ganancia);
+            document.getElementById('precioFinal').textContent = formatCurrency(precioFinal);
+            
+            document.getElementById('montoSeparar').textContent = formatCurrency(montoSeparar);
+        }
+        
+        // Función para actualizar los costos base sugeridos
+        function actualizarCostosBase() {
+            const costoTintaSet = parseFloat(document.getElementById('costoTintaSet').value) || 0;
+            const rendimientoTinta = parseFloat(document.getElementById('rendimientoTinta').value) || 1;
+
+            const costoTintaSugerido = costoTintaSet / rendimientoTinta;
+            
+            // Actualiza el valor del campo de costo de tinta editable
+            document.getElementById('costoTintaPorPagina').value = costoTintaSugerido.toFixed(2);
+            
+            // Llama a la función principal para recalcular todo
+            calcularTodo();
+        }
+
+        // --- Event Listeners ---
+        const configInputs = ['costoTintaSet', 'rendimientoTinta', 'costoPapelPaquete', 'unidadesPapel'];
+        const calculoInputs = ['costoTintaPorPagina', 'costoDiseno', 'margenGanancia', 'cantidadHojas', 'incluyeDiseno', 'cliente', 'trabajo'];
+
+        // Listeners para actualizar los costos base y recalcular todo
+        configInputs.forEach(id => {
+            document.getElementById(id).addEventListener('input', actualizarCostosBase);
+        });
+        
+        // Listeners para recalcular solo el presupuesto final
+        calculoInputs.forEach(id => {
+            document.getElementById(id).addEventListener('input', calcularTodo);
+        });
+
+        // Calculamos todo una vez al cargar la página
+        document.addEventListener('DOMContentLoaded', actualizarCostosBase);
+    </script>
+
+</body>
+</html>
