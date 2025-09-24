@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Titan+One&display=swap" rel="stylesheet">
     <title>Calculadora de Presupuestos</title>
     <style>
         :root {
@@ -92,6 +95,18 @@
         }
         .page { display: none; }
         .page.active { display: block; }
+
+        .main-title {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 1.5rem;
+            font-weight: 600;
+            font-family: "Titan One", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+            text-align: center;
+        }
+
         .card {
             background-color: var(--card-bg-color);
             border-radius: 8px;
@@ -156,7 +171,6 @@
         }
         #save-button:hover { background-color: #218838; }
 
-        /* --- ESTILOS PANEL PRESUPUESTOS GUARDADOS --- */
         #saved-budgets-list { list-style: none; padding: 0; }
         .budget-item {
             background-color: #f8f9fa;
@@ -225,6 +239,9 @@
         <div class="container">
             <div id="calculator-page" class="page active">
                 <input type="hidden" id="editing-budget-id">
+                
+                <h2 class="main-title">❤ CC-REGALOS ❤</h2>
+
                 <div class="card">
                     <div class="card-header">CONFIGURACIÓN DE COSTOS</div>
                     <div class="form-group"><label for="costoTintaSet">Costo Total Set de Tintas</label><div class="input-wrapper"><span class="symbol">$</span><input type="number" id="costoTintaSet" value="150426"></div></div>
@@ -235,17 +252,24 @@
                         <label for="tipoPapel">Seleccionar Tipo de Papel</label>
                         <div class="input-wrapper">
                             <select id="tipoPapel">
-                                <option value="0" data-price="0">-- Elige un papel --</option>
-                                <option value="1" data-price="11472">Fotográfico Glossy 180gr (100 hojas)</option>
-                                <option value="2" data-price="9500">Opalina 180gr (100 hojas)</option>
-                                <option value="3" data-price="8200">Autoadhesivo 135gr (50 hojas)</option>
-                                <option value="4" data-price="15000">Ilustración 300gr (50 hojas)</option>
+                                <option value="0" data-price="0" data-sheets="">-- Elige un papel --</option>
+                                <option data-price="10470" data-sheets="100">Matelina simple faz 180gr (100 hojas)</option>
+                                <option data-price="11472" data-sheets="100">Matelina 230gr (100 hojas)</option>
+                                <option data-price="6156" data-sheets="50">Matelina doble faz 180gr (50 hojas)</option>
+                                <option data-price="6933" data-sheets="50">Matelina doble faz 200gr (50 hojas)</option>
+                                <option data-price="7567" data-sheets="50">Matelina doble faz 260gr (50 hojas)</option>
+                                <option data-price="16810" data-sheets="100">Fotográfico adhesivo 115gr (100 hojas)</option>
+                                <option data-price="8405" data-sheets="100">Fotográfico simple faz 160gr (100 hojas)</option>
+                                <option data-price="10368" data-sheets="100">Fotográfico simple faz 200gr (100 hojas)</option>
+                                <option data-price="7276" data-sheets="20">Fotográfico profesional 260gr (20 hojas)</option>
+                                <option data-price="6053" data-sheets="20">Filmilo mate (20 hojas)</option>
+                                <option data-price="8794" data-sheets="20">Filmilo transparente (20 hojas)</option>
                             </select>
                         </div>
                     </div>
-                    <div class="form-group"><label for="costoPapelPaquete">Costo Paquete de Papel</label><div class="input-wrapper"><span class="symbol">$</span><input type="number" id="costoPapelPaquete" value="11472"></div></div>
-                    <div class="form-group"><label for="unidadesPapel">Unidades por Paquete</label><div class="input-wrapper"><input type="number" id="unidadesPapel" value="100"></div></div>
-                    <div class="form-group"><label>Costo de Papel por Hoja</label><div class="input-wrapper output" id="costoPorHoja">$ 114.72</div></div>
+                    <div class="form-group"><label for="costoPapelPaquete">Costo Paquete de Papel</label><div class="input-wrapper"><span class="symbol">$</span><input type="number" id="costoPapelPaquete" value=""></div></div>
+                    <div class="form-group"><label for="unidadesPapel">Unidades por Paquete</label><div class="input-wrapper"><input type="number" id="unidadesPapel" value=""></div></div>
+                    <div class="form-group"><label>Costo de Papel por Hoja</label><div class="input-wrapper output" id="costoPorHoja">$ 0.00</div></div>
                 </div>
 
                 <div class="card">
@@ -297,7 +321,6 @@
 
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // --- CONSTANTES DE ELEMENTOS ---
         const sidebar = document.getElementById('sidebar');
         const mainContent = document.getElementById('main-content');
         const toggleBtn = document.getElementById('toggle-btn');
@@ -306,13 +329,12 @@
         const saveButton = document.getElementById('save-button');
         const paperTypeSelect = document.getElementById('tipoPapel');
         const paperCostInput = document.getElementById('costoPapelPaquete');
+        const unidadesPapelInput = document.getElementById('unidadesPapel');
         const budgetListUI = document.getElementById('saved-budgets-list');
 
-        // --- MANEJO DE DATOS CON LOCALSTORAGE ---
         const getBudgets = () => JSON.parse(localStorage.getItem('budgets')) || [];
         const saveBudgets = (budgets) => localStorage.setItem('budgets', JSON.stringify(budgets));
 
-        // --- LÓGICA DE LA INTERFAZ (MENÚ, NAVEGACIÓN, ETC.) ---
         toggleBtn.addEventListener('click', () => {
             sidebar.classList.toggle('hidden');
             mainContent.classList.toggle('full-width');
@@ -329,14 +351,22 @@
                 }
             });
         });
-
+        
+        // --- CORRECCIÓN EN EL EVENT LISTENER DEL PAPEL ---
         paperTypeSelect.addEventListener('change', () => {
             const selectedOption = paperTypeSelect.options[paperTypeSelect.selectedIndex];
-            paperCostInput.value = selectedOption.getAttribute('data-price') || 0;
+            const price = selectedOption.getAttribute('data-price') || 0;
+            const sheets = selectedOption.getAttribute('data-sheets') || 0;
+
+            // Actualiza el costo del paquete
+            paperCostInput.value = price;
             paperCostInput.dispatchEvent(new Event('input'));
+            
+            // Actualiza las unidades y dispara su evento para recalcular
+            unidadesPapelInput.value = sheets;
+            unidadesPapelInput.dispatchEvent(new Event('input'));
         });
 
-        // --- FUNCIÓN PARA RENDERIZAR LOS PRESUPUESTOS GUARDADOS ---
         const renderBudgets = () => {
             budgetListUI.innerHTML = '';
             const budgets = getBudgets();
@@ -378,7 +408,6 @@
             });
         };
 
-        // --- LÓGICA DE CÁLCULO ---
         const getInputValues = () => {
             const selectedPaperOption = paperTypeSelect.options[paperTypeSelect.selectedIndex];
             return {
@@ -389,14 +418,13 @@
                 margenGanancia: parseFloat(document.getElementById('margenGanancia').value) || 0,
                 cantidadHojas: document.getElementById('cantidadHojas').value,
                 incluyeDiseno: document.getElementById('incluyeDiseno').value,
-                // CAPTURAMOS EL TEXTO DEL PAPEL
                 tipoPapel: selectedPaperOption.text
             };
         };
 
         const calculateAll = () => {
             const values = getInputValues();
-            const costoPorHoja = values.costoPapelPaquete / values.unidadesPapel;
+            const costoPorHoja = values.unidadesPapel > 0 ? values.costoPapelPaquete / values.unidadesPapel : 0;
             const totalCostoTinta = values.costoTintaPorPagina * parseFloat(values.cantidadHojas);
             const totalCostoPapel = costoPorHoja * parseFloat(values.cantidadHojas);
             const totalCostoDiseno = (values.incluyeDiseno === 'si') ? values.costoDiseno : 0;
@@ -421,7 +449,6 @@
             calculateAll();
         };
 
-        // --- LÓGICA DE GUARDAR, MODIFICAR Y ELIMINAR ---
         const resetForm = () => {
             document.getElementById('cliente').value = '';
             document.getElementById('trabajo').value = '';
@@ -441,7 +468,6 @@
                 id: editingId ? parseInt(editingId) : Date.now(),
                 cliente,
                 trabajo,
-                // GUARDAMOS LOS NUEVOS DATOS
                 tipoPapel: currentInputs.tipoPapel,
                 cantidadHojas: currentInputs.cantidadHojas,
                 costoTinta: document.getElementById('totalCostoTinta').textContent,
@@ -492,7 +518,6 @@
                     Object.keys(budgetToEdit.inputs).forEach(key => {
                         const el = document.getElementById(key);
                         if (el) {
-                           // Manejo especial para el select de papel
                            if (key === 'tipoPapel') {
                                 for(let i = 0; i < paperTypeSelect.options.length; i++){
                                     if(paperTypeSelect.options[i].text === budgetToEdit.inputs[key]){
@@ -513,7 +538,6 @@
             }
         });
 
-        // --- LÓGICA DE ELIMINACIÓN AUTOMÁTICA ---
         const cleanupOldBudgets = () => {
             let budgets = getBudgets();
             const tenDaysAgo = Date.now() - (10 * 24 * 60 * 60 * 1000);
@@ -523,7 +547,6 @@
             }
         };
 
-        // --- INICIALIZACIÓN ---
         const configInputs = ['costoTintaSet', 'rendimientoTinta', 'costoPapelPaquete', 'unidadesPapel'];
         const calculoInputs = ['costoTintaPorPagina', 'costoDiseno', 'margenGanancia', 'cantidadHojas', 'incluyeDiseno', 'tipoPapel'];
         
